@@ -16,8 +16,8 @@ root.geometry("400x480")
 
 pygame.mixer.init()
 
-list_of_songs = ['CodableF23\music\City.wav']
-list_of_covers = ['CodableF23\img\city.jpg']
+list_of_songs = ['CodableF23/music/City.wav']
+list_of_covers = ['CodableF23/img/city.jpg']
 n = 0
 
 
