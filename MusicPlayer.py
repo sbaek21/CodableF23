@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 from threading import *
 import time 
 import math
+import tkinter.messagebox
 
 
 customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
@@ -36,7 +37,6 @@ def get_album_cover(song_name, n):
     song_name_label.place(relx=0.4,rely=0.6)
 
 
-
 def progress():
     a = pygame.mixer.Sound(f"{list_of_songs[n]}")
     song_len = a.get_length()*3
@@ -49,22 +49,41 @@ def threading():
     t1.start()
 
 def play_music():
-    threading()
     global n
-    current_song = n
-    if n > 2:
-        n=0
     song_name = list_of_songs[n]
-    pygame.mixer.music.load(song_name)
-    pygame.mixer.music.play(loops=0)
-    pygame.mixer.music.set_volume(0.5)
-    get_album_cover(song_name, n)
+    threading()
+    try:
+        paused
+    except NameError:
+        try:
+            pygame.mixer.music.load(song_name)
+            pygame.mixer.music.play(loops=0)
+            pygame.mixer.music.set_volume(0.5)
+            get_album_cover(song_name, n)
+        except:
+            tkinter.messagebox.showerror('File not found', 'Melody could not find the file.')
+    else:
+        pygame.mixer.music.unpause()
+    n += 1
+    if n >= len(list_of_songs):
+        n = 0
+
+    # global n
+    # current_song = n
+    # if n > 2:
+    #     n=0
+    # song_name = list_of_songs[n]
+    # pygame.mixer.music.load(song_name)
+    # pygame.mixer.music.play(loops=0)
+    # pygame.mixer.music.set_volume(0.5)
+    # get_album_cover(song_name, n)
     #print("PLAY")
-    n+=1
 def pause_music():
+    global paused
+    paused = True
     pygame.mixer.music.pause()
-def unpause_music():
-    pygame.mixer.music.unpause()
+# def unpause_music():
+#     pygame.mixer.music.unpause()
 
 def rewind_music():
     pygame.mixer.music.rewind()
@@ -88,8 +107,8 @@ play_button.place(relx=0.4,rely=0.7,anchor=tkinter.CENTER)
 pause_button = customtkinter.CTkButton(master=root, text="⏸️", command = pause_music, width = 1)
 pause_button.place(relx=0.5,rely=0.7,anchor=tkinter.CENTER)
 
-unpause_button = customtkinter.CTkButton(master=root, text="▶️", command = unpause_music, width = 1)
-unpause_button.place(relx=0.6,rely=0.7,anchor=tkinter.CENTER)
+# unpause_button = customtkinter.CTkButton(master=root, text="▶️", command = unpause_music, width = 1)
+# unpause_button.place(relx=0.6,rely=0.7,anchor=tkinter.CENTER)
 
 rewind_button = customtkinter.CTkButton(master=root, text="🔁", command = rewind_music, width =1)
 rewind_button.place(relx=0.3,rely=0.7,anchor=tkinter.CENTER)
@@ -101,8 +120,8 @@ skip_f.place(relx=0.8,rely=0.7,anchor=tkinter.CENTER)
 skip_b = customtkinter.CTkButton(master=root, text="⏮️", command = skip_backward, width=2)
 skip_b.place(relx=0.2,rely=0.7,anchor=tkinter.CENTER)
 
-slider = customtkinter.CTkSlider(master=root, from_=0, to=1, command=volume, width=210)
-slider.place(relx=0.5,rely=0.78,anchor=tkinter.CENTER)
+volume = customtkinter.CTkSlider(master=root, from_=0, to=1, command=volume, width=210)
+volume.place(relx=0.5,rely=0.78,anchor=tkinter.CENTER)
 
 progressbar = customtkinter.CTkProgressBar(master=root, progress_color="#9df593", width=250)
 progressbar.place(relx=0.5,rely=0.85,anchor=tkinter.CENTER)
