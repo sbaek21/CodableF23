@@ -58,6 +58,7 @@ def threading():
     t1.start()
 def play_music():
     global n, is_paused
+    threading()
     if is_paused:
         pygame.mixer.music.unpause()
         is_paused = False
@@ -73,26 +74,26 @@ def play_music():
     n += 1
     if n >= len(list_of_songs):
         n = 0
-""" def play_music():
-    global n
-    song_name = list_of_songs[n]
-    threading()
-    try:
-        paused
-    except NameError:
-        try:
-            pygame.mixer.music.load(song_name)
-            pygame.mixer.music.play(loops=0)
-            pygame.mixer.music.set_volume(0.5)
-            get_album_cover(song_name, n)
-        except:
-            print("Error playing music")
-    else:
-        pygame.mixer.music.unpause()
-    n += 1
-    if n >= len(list_of_songs):
-        n = 0
-"""
+# """ def play_music():
+#     global n
+#     song_name = list_of_songs[n]
+#     threading()
+#     try:
+#         paused
+#     except NameError:
+#         try:
+#             pygame.mixer.music.load(song_name)
+#             pygame.mixer.music.play(loops=0)
+#             pygame.mixer.music.set_volume(0.5)
+#             get_album_cover(song_name, n)
+#         except:
+#             print("Error playing music")
+#     else:
+#         pygame.mixer.music.unpause()
+#     n += 1
+#     if n >= len(list_of_songs):
+#         n = 0
+# """
 
 def pause_music():
     global is_paused
