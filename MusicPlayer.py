@@ -15,29 +15,16 @@ customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-bl
 root = customtkinter.CTk()
 
 root.title("Music Player")
-root.geometry("400x480")
+root.geometry("400x500")
+root.resizable(0, 0)
+
 
 pygame.mixer.init()
 
-
-#cover_folder_path = 'img/'
-#list_of_covers = [os.path.join(cover_folder_path, cover) for cover in os.listdir(cover_folder_path) if cover.endswith('.jpg')]
 n = 0
 is_paused = False
 playlist = []
 
-#def get_album_cover(song_name, n):
-#    image1 = Image.open(list_of_covers[n])
-#    image2=image1.resize((750, 750))
-#    load = ImageTk.PhotoImage(image2)
-#    
-#    label1 = tkinter.Label(root, image=load)
-#    label1.image = load
-#    label1.place(relx=.19, rely=.06)
-#    
-#    stripped_string = song_name[6:-3]
-#    song_name_label = tkinter.Label(text= stripped_string,bg="#222222", fg="white")
-#    song_name_label.place(relx=0.4,rely=0.6)
 
 def update_song_listbox():
     song_listbox.delete(0, tkinter.END)  
@@ -125,7 +112,7 @@ rewind_image = tkinter.PhotoImage(file="icons/repeat.png")
 
 
 #Buttons
-play_button = customtkinter.CTkButton(master=root, image=play_image, text="", command = play_music, width =1)
+play_button = customtkinter.CTkButton(master=root, image=play_image, text="", command = play_music, width = 1)
 play_button.place(relx=0.5,rely=0.7,anchor=tkinter.CENTER)
 
 pause_button = customtkinter.CTkButton(master=root, image=pause_image, text="", command = pause_music, width = 1)
@@ -151,16 +138,21 @@ progressbar.place(relx=0.5,rely=0.85,anchor=tkinter.CENTER)
 select_folder_button = customtkinter.CTkButton(master=root, text="Select Folder", command=select_folder)
 select_folder_button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
-song_listbox = tkinter.Listbox(root, bg="#333333", fg="white", font=("Helvetica", 30))
-song_listbox.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER, height=500, width=750)
+song_listbox = tkinter.Listbox(root, bg="#333333", fg="white", font=("Helvetica", 20))
+song_listbox.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER, height=200, width=330)
 
 scrollbar = tkinter.Scrollbar(root)
-scrollbar.place(relx=0.834, rely=0.3, anchor=tkinter.CENTER, height=500)
+scrollbar.place(relx=0.9, rely=0.3, anchor=tkinter.CENTER, height=200)
 
 song_listbox.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=song_listbox.yview)
 
 song_listbox.bind("<Double-Button-1>", play_selected_song)
 song_listbox.bind("<Return>", play_selected_song)
-
+# screen = pygame.display.set_mode((2560, 1600), pygame.FULLSCREEN | pygame.SCALED)
 root.mainloop()
+
+
+
+
+
