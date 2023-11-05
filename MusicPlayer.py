@@ -1,13 +1,13 @@
 import tkinter
 import customtkinter
 import pygame
-from PIL import Image, ImageTk
 from threading import *
 import time 
 import math
 import os
 from tkinter import filedialog
-from customtkinter import CTkImage
+# from customtkinter import CTkImage
+# from PIL import Image, ImageTk
 
 customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
@@ -16,7 +16,6 @@ root = customtkinter.CTk()
 
 root.title("Music Player")
 root.geometry("400x500")
-root.resizable(0, 0)
 
 
 pygame.mixer.init()
@@ -53,8 +52,10 @@ def threading():
     t1 = Thread(target=progress)
     t1.start()
 def play_music():
-    threading()
+    # threading()
     global n, is_paused
+    if n >= len(list_of_songs):
+        n = 0
     if is_paused:
         pygame.mixer.music.unpause()
         is_paused = False
@@ -64,15 +65,13 @@ def play_music():
             pygame.mixer.music.load(song_name)
             pygame.mixer.music.play(loops=0)
             pygame.mixer.music.set_volume(0.5)
-#            get_album_cover(song_name, n)
         except:
             print("Error playing music")
     song_listbox.select_clear(0, tkinter.END)  
     song_listbox.select_set(n)  
     song_listbox.see(n)  
     n += 1
-    if n >= len(list_of_songs):
-        n = 0
+
 
 
 def pause_music():
@@ -81,15 +80,19 @@ def pause_music():
     pygame.mixer.music.pause()
 
 def rewind_music():
-    pygame.mixer.music.rewind()
+    # pygame.mixer.music.rewind()
+    pygame.mixer.music.stop()
+    pygame.mixer.music.play(start=0)
     progressbar.set(0)
     threading()
 def skip_forward():
     play_music()
 def skip_backward():
     global n
-    n -= 2
+    if n > 0:
+        n -= 1
     play_music()
+
 def volume(value):
     #print(value)
     pygame.mixer.music.set_volume(value)
@@ -149,10 +152,4 @@ scrollbar.config(command=song_listbox.yview)
 
 song_listbox.bind("<Double-Button-1>", play_selected_song)
 song_listbox.bind("<Return>", play_selected_song)
-# screen = pygame.display.set_mode((2560, 1600), pygame.FULLSCREEN | pygame.SCALED)
 root.mainloop()
-
-
-
-
-
