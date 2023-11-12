@@ -42,16 +42,23 @@ def select_folder():
         update_song_listbox()
 
 
+
 # def progress():
 #     a = pygame.mixer.Sound(f"{list_of_songs[n]}")
-#     song_len = a.get_length()*3
-#     for i in range(0,math.ceil(song_len)):
-#         time.sleep(0.3)
-#         progressbar.set(pygame.mixer.music.get_pos()/100000)
-#     root.after(300, progress)
+#     song_len = a.get_length() * 3
+#     if pygame.mixer.music.get_busy():
+#         progressbar.set(pygame.mixer.music.get_pos() / 100000)
+#         root.after(100, progress)
+#     else:
+#         global inactive_ticks
+#         inactive_ticks += 1
+#         if inactive_ticks == 10:
+#             play_music()
+#             inactive_ticks = 0
+#         else:
+#             root.after(100, progress)
+
 def progress():
-    a = pygame.mixer.Sound(f"{list_of_songs[n]}")
-    song_len = a.get_length() * 3
     if pygame.mixer.music.get_busy():
         progressbar.set(pygame.mixer.music.get_pos() / 100000)
         root.after(100, progress)
@@ -64,12 +71,31 @@ def progress():
         else:
             root.after(100, progress)
 
-
 def threading():
     t1 = Thread(target=progress)
     t1.start()
+# def play_music():
+#     # threading()
+#     global n, is_paused, inactive_ticks
+#     if n >= len(list_of_songs):
+#         n = 0
+#     if is_paused:
+#         pygame.mixer.music.unpause()
+#         is_paused = False
+#     else:
+#         try:
+#             song_name = list_of_songs[n]
+#             pygame.mixer.music.load(song_name)
+#             pygame.mixer.music.play(loops=0)
+#             pygame.mixer.music.set_volume(0.5)
+#         except:
+#             print("Error playing music")
+#     song_listbox.select_clear(0, tkinter.END)  
+#     song_listbox.select_set(n)  
+#     song_listbox.see(n)  
+#     n += 1
+
 def play_music():
-    # threading()
     global n, is_paused, inactive_ticks
     if n >= len(list_of_songs):
         n = 0
@@ -82,13 +108,16 @@ def play_music():
             pygame.mixer.music.load(song_name)
             pygame.mixer.music.play(loops=0)
             pygame.mixer.music.set_volume(0.5)
+
+            # Call progress to handle the progress of the current song
+            progress()
         except:
             print("Error playing music")
-    song_listbox.select_clear(0, tkinter.END)  
-    song_listbox.select_set(n)  
-    song_listbox.see(n)  
-    n += 1
 
+    song_listbox.select_clear(0, tkinter.END)
+    song_listbox.select_set(n)
+    song_listbox.see(n)
+    n += 1
 
 
 def pause_music():
