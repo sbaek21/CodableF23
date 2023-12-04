@@ -6,8 +6,6 @@ import time
 import math
 import os
 from tkinter import filedialog
-# from customtkinter import CTkImage
-# from PIL import Image, ImageTk
 
 customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
@@ -22,6 +20,7 @@ pygame.mixer.init()
 
 n = 0
 is_paused = False
+inactive_ticks = 0
 playlist = []
 
 
@@ -35,43 +34,61 @@ def select_folder():
     global list_of_songs, n
     folder_path = filedialog.askdirectory()
     if folder_path:
-        list_of_songs = [os.path.join(folder_path, song) for song in os.listdir(folder_path) if song.endswith(('.wav', '.mp3'))]
+        list_of_songs = [os.path.join(folder_path, song) for song in os.listdir(folder_path)
+                         if song.endswith(('.wav', '.mp3'))]
         n = 0
         update_song_listbox()
 
+def update_timeline():
+    current_time = pygame.mixer.music.get_pos() // 1000
+    converted_current_time = time.strftime('%M:%S', time.gmtime(current_time))
+    timeline_label.config(text=converted_current_time)
+    root.after(1000, update_timeline)
 
 def progress():
-    a = pygame.mixer.Sound(f"{list_of_songs[n]}")
-    song_len = a.get_length()*3
-    for i in range(0,math.ceil(song_len)):
-        time.sleep(0.3)
-        progressbar.set(pygame.mixer.music.get_pos()/100000)
-    root.after(300, progress)
+    global is_paused
+    if pygame.mixer.music.get_busy() and not is_paused:
+        progressbar.set(pygame.mixer.music.get_pos() / 100000)
+        update_timeline()
+        root.after(100, progress)
+    else:
+        global inactive_ticks
+        inactive_ticks += 1
+        if inactive_ticks == 10 and not is_paused:
+            play_music()
+            inactive_ticks = 0
+        else:
+            root.after(100, progress)
 
 def threading():
     t1 = Thread(target=progress)
     t1.start()
+
+
 def play_music():
-    # threading()
-    global n, is_paused
-    if n >= len(list_of_songs):
-        n = 0
+    global n, is_paused, inactive_ticks
     if is_paused:
         pygame.mixer.music.unpause()
         is_paused = False
+        return
+    if n >= len(list_of_songs):
+        n = 0
     else:
         try:
             song_name = list_of_songs[n]
             pygame.mixer.music.load(song_name)
             pygame.mixer.music.play(loops=0)
             pygame.mixer.music.set_volume(0.5)
+
+            # Call progress to handle the progress of the current song
+            progress()
         except:
             print("Error playing music")
-    song_listbox.select_clear(0, tkinter.END)  
-    song_listbox.select_set(n)  
-    song_listbox.see(n)  
-    n += 1
 
+    song_listbox.select_clear(0, tkinter.END)
+    song_listbox.select_set(n)
+    song_listbox.see(n)
+    n += 1
 
 
 def pause_music():
@@ -84,13 +101,14 @@ def rewind_music():
     pygame.mixer.music.stop()
     pygame.mixer.music.play(start=0)
     progressbar.set(0)
-    threading()
+    progress()
+    # threading()
 def skip_forward():
     play_music()
 def skip_backward():
     global n
     if n > 0:
-        n -= 1
+        n -= 2
     play_music()
 
 def volume(value):
@@ -122,7 +140,7 @@ pause_button = customtkinter.CTkButton(master=root, image=pause_image, text="", 
 pause_button.place(relx=0.6,rely=0.7,anchor=tkinter.CENTER)
 #root.bind("<KeyPress-Space>", lambda event: pause_music())
 
-rewind_button = customtkinter.CTkButton(master=root, image=rewind_image, text="", command = rewind_music, width =1)
+rewind_button = customtkinter.CTkButton(master=root, image=rewind_image, text="", command = rewind_music, width = 1)
 rewind_button.place(relx=0.4,rely=0.7,anchor=tkinter.CENTER)
 
 
@@ -136,7 +154,11 @@ volume = customtkinter.CTkSlider(master=root, from_=0, to=1, command=volume, wid
 volume.place(relx=0.05,rely=0.78,anchor=tkinter.CENTER)
 
 progressbar = customtkinter.CTkProgressBar(master=root, progress_color="#9df593", width=250)
-progressbar.place(relx=0.5,rely=0.85,anchor=tkinter.CENTER)
+progressbar.place(relx=0.5,rely=0.8,anchor=tkinter.CENTER)
+
+# Add a new label to display the timeline above the progress bar
+timeline_label = tkinter.Label(root, text='0:00', fg='white', bg='#333333', font=("Helvetica", 12))
+timeline_label.place(relx=0.5, rely=0.83, anchor=tkinter.CENTER)
 
 select_folder_button = customtkinter.CTkButton(master=root, text="Select Folder", command=select_folder)
 select_folder_button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
